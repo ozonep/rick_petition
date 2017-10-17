@@ -53,7 +53,7 @@ app.get("/", (req, res) => {
             title: "Petition",
             helpers: {
                 err: function () {
-                    if (empty) return "Sorry, you didn't fill all necessary fields";
+                    if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
                 }
             }
         });
@@ -62,7 +62,12 @@ app.get("/", (req, res) => {
 
 app.get("/register", (req, res) => {
     res.render("register", {
-        title: "registration"
+        title: "registration",
+        helpers: {
+            err: function () {
+                if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
+            }
+        }
     });
 });
 
@@ -71,7 +76,12 @@ app.get("/login", (req, res) => {
         res.redirect("/");
     } else {
         res.render("login", {
-            title: "Log in"
+            title: "Log in",
+            helpers: {
+                err: function () {
+                    if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
+                }
+            }
         });
     }
 });
@@ -101,6 +111,7 @@ app.post("/login", (req, res) => {
                     res.redirect("/login");
                 }
             }).then(() => {
+                empty = false;
                 res.redirect("/");
             }).catch(function(err) {
                 console.log(err);
@@ -129,11 +140,13 @@ app.post("/register", (req, res) => {
                 };
             }).then(() => {
                 res.redirect("/");
+                empty = false;
             }).catch((err) => {
                 console.log(err);
             });
         } else {
             res.redirect("/register");
+            empty = true;
         }
     });
 });

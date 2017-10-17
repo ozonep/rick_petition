@@ -4,23 +4,25 @@ const spicedPg = require('spiced-pg');
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
+const csurf = require("csurf");
 const app = express();
 const db = spicedPg('postgres:ivanmalkov:password@localhost:5432/pet');
 var empty = false;
 var date = new Date();
+// var countries = require ('countries-cities').getCountries();
+// var cities = require ('countries-cities').getCities(country_name);
+
 
 app.engine('handlebars', hb({defaultLayout: 'main'}));
-
 app.set('view engine', 'handlebars');
 
 app.use(cookieSession({
     secret: 'something stupid',
     maxAge: 1000 * 60 * 60 * 24 * 14
 }));
-
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use('/public', express.static(__dirname + '/public'));
+// app.use(csurf({ cookie: false }));
 
 function hashPassword(plainTextPassword) {
     return new Promise(function(resolve, reject) {
@@ -65,6 +67,11 @@ app.get("/", (req, res) => {
     }
 });
 
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/login");
+});
+
 app.get("/register", (req, res) => {
     res.render("register", {
         title: "registration",
@@ -105,15 +112,15 @@ app.post("/login", (req, res) => {
             if (doesMatch) {
                 req.session.user = {
                     first: result.first,
-                    last: result.last
+                    last: result.last,
+                    id: result.id
                 };
+                empty = false;
+                res.redirect("/");
             } else {
                 res.redirect("/login");
             }
-        }).then(() => {
-            empty = false;
-            res.redirect("/");
-        }).catch(function(err) {
+        }).catch((err) => {
             console.log(err);
         });
     } else {
@@ -152,16 +159,16 @@ app.post("/register", (req, res) => {
 app.post("/form", (req, res) => {
     let data = req.body;
     console.log(data);
-    if (data.name && data.surname && data.canvasimg) {
-        const text = 'INSERT INTO signatures (first, last, signature, date) VALUES ($1, $2, $3, $4) RETURNING *';
-        const values = [data.name, data.surname, data.canvasimg, date];
+    if (data.canvasimg) {
+        const text = 'INSERT INTO signatures (signature, user_id) VALUES ($1, $2) RETURNING *';
+        const values = [data.canvasimg, req.session.user.id];
         db.query(text, values).then((results) => {
             console.log(results.rows[0]);
             req.session.signatureId = results.rows[0].id;
         }).then(() => {
             res.redirect("/thanks");
             empty = false;
-        }).catch(function(err) {
+        }).catch((err) => {
             console.log(err);
         });
     } else {
@@ -179,7 +186,7 @@ app.get("/thanks", (req, res) => {
             number: voterNumber,
             sign: myImg
         });
-    }).catch(function(err) {
+    }).catch((err) => {
         console.log(err);
     });
 });
@@ -192,7 +199,7 @@ app.get("/signers", (req, res) => {
             title: "Signers",
             voters: voters,
         });
-    }).catch(function(err) {
+    }).catch((err) => {
         console.log(err);
     });
 });

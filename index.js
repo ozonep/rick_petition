@@ -1,20 +1,25 @@
 const express = require("express");
-const app = express();
 const hb = require("express-handlebars");
 const spicedPg = require('spiced-pg');
-const querystring = require('querystring');
+const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
-const db = spicedPg('postgres:ivanmalkov:password@localhost:5432/pet');
 const bcrypt = require('bcryptjs');
+const app = express();
+const db = spicedPg('postgres:ivanmalkov:password@localhost:5432/pet');
 var empty = false;
 var date = new Date();
 
 app.engine('handlebars', hb({defaultLayout: 'main'}));
+
 app.set('view engine', 'handlebars');
+
 app.use(cookieSession({
     secret: 'something stupid',
     maxAge: 1000 * 60 * 60 * 24 * 14
 }));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use('/public', express.static(__dirname + '/public'));
 
 function hashPassword(plainTextPassword) {
@@ -88,7 +93,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
     let result;
-    let data = querystring.parse(req.body);
+    let data = req.body;
     if (data.email && data.pass) {
         const text = 'SELECT * FROM users WHERE email = $1';
         const value = [data.email];
@@ -111,21 +116,26 @@ app.post("/login", (req, res) => {
         }).catch(function(err) {
             console.log(err);
         });
+    } else {
+        empty = true;
+        res.redirect("/login");
     }
 });
 
 app.post("/register", (req, res) => {
-    let data = querystring.parse(req.body);
+    let data = req.body;
     console.log(data);
     if (data.name && data.surname && data.email && data.pass) {
         hashPassword(data.pass).then((hash) => {
             const text = 'INSERT INTO users (first, last, email, password) VALUES ($1, $2, $3, $4) RETURNING *';
             const values = [data.name, data.surname, data.email, hash];
             return db.query(text, values);
-        }).then(() => {
+        }).then((results) => {
+            console.log(results.rows);
             req.session.user = {
-                first: data.name,
-                last: data.surname
+                first: results.rows[0].first,
+                last: results.rows[0].last,
+                id: results.rows[0].id
             };
         }).then(() => {
             res.redirect("/");
@@ -134,13 +144,13 @@ app.post("/register", (req, res) => {
             console.log(err);
         });
     } else {
-        res.redirect("/register");
         empty = true;
+        res.redirect("/register");
     }
 });
 
 app.post("/form", (req, res) => {
-    let data = querystring.parse(req.body);
+    let data = req.body;
     console.log(data);
     if (data.name && data.surname && data.canvasimg) {
         const text = 'INSERT INTO signatures (first, last, signature, date) VALUES ($1, $2, $3, $4) RETURNING *';

@@ -87,96 +87,77 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    let body = '';
-    req.on("data", (chunks) => {
-        body += chunks;
-    });
-    req.on("end", () => {
-        let resul;
-        let data = querystring.parse(body);
-        if (data.email && data.pass) {
-            const text = 'SELECT * FROM users WHERE email = $1';
-            const value = [data.email];
-            db.query(text, value).then((results) => {
-                resul = results.rows[0];
-                return checkPassword(data.pass, resul.password);
-            }).then((doesMatch) => {
-                console.log(doesMatch);
-                if (doesMatch) {
-                    req.session.user = {
-                        first: resul.first,
-                        last: resul.last
-                    };
-                } else {
-                    res.redirect("/login");
-                }
-            }).then(() => {
-                empty = false;
-                res.redirect("/");
-            }).catch(function(err) {
-                console.log(err);
-            });
-        }
-    });
+    let result;
+    let data = querystring.parse(req.body);
+    if (data.email && data.pass) {
+        const text = 'SELECT * FROM users WHERE email = $1';
+        const value = [data.email];
+        db.query(text, value).then((results) => {
+            result = results.rows[0];
+            return checkPassword(data.pass, result.password);
+        }).then((doesMatch) => {
+            console.log(doesMatch);
+            if (doesMatch) {
+                req.session.user = {
+                    first: result.first,
+                    last: result.last
+                };
+            } else {
+                res.redirect("/login");
+            }
+        }).then(() => {
+            empty = false;
+            res.redirect("/");
+        }).catch(function(err) {
+            console.log(err);
+        });
+    }
 });
 
 app.post("/register", (req, res) => {
-    let body = '';
-    req.on("data", (chunks) => {
-        body += chunks;
-    });
-    req.on("end", () => {
-        let data = querystring.parse(body);
-        console.log(data);
-        if (data.name && data.surname && data.email && data.pass) {
-            hashPassword(data.pass).then((hash) => {
-                const text = 'INSERT INTO users (first, last, email, password) VALUES ($1, $2, $3, $4) RETURNING *';
-                const values = [data.name, data.surname, data.email, hash];
-                return db.query(text, values);
-            }).then(() => {
-                req.session.user = {
-                    first: data.name,
-                    last: data.surname
-                };
-            }).then(() => {
-                res.redirect("/");
-                empty = false;
-            }).catch((err) => {
-                console.log(err);
-            });
-        } else {
-            res.redirect("/register");
-            empty = true;
-        }
-    });
+    let data = querystring.parse(req.body);
+    console.log(data);
+    if (data.name && data.surname && data.email && data.pass) {
+        hashPassword(data.pass).then((hash) => {
+            const text = 'INSERT INTO users (first, last, email, password) VALUES ($1, $2, $3, $4) RETURNING *';
+            const values = [data.name, data.surname, data.email, hash];
+            return db.query(text, values);
+        }).then(() => {
+            req.session.user = {
+                first: data.name,
+                last: data.surname
+            };
+        }).then(() => {
+            res.redirect("/");
+            empty = false;
+        }).catch((err) => {
+            console.log(err);
+        });
+    } else {
+        res.redirect("/register");
+        empty = true;
+    }
 });
 
 app.post("/form", (req, res) => {
-    let body = '';
-    // req.setEncoding('utf-8');
-    req.on("data", (chunks) => {
-        body += chunks;
-    });
-    req.on("end", () => {
-        let data = querystring.parse(body);
-        console.log(data);
-        if (data.name && data.surname && data.canvasimg) {
-            const text = 'INSERT INTO signatures (first, last, signature, date) VALUES ($1, $2, $3, $4) RETURNING *';
-            const values = [data.name, data.surname, data.canvasimg, date];
-            db.query(text, values).then((results) => {
-                console.log(results.rows[0]);
-                req.session.signatureId = results.rows[0].id;
-            }).then(() => {
-                res.redirect("/thanks");
-                empty = false;
-            }).catch(function(err) {
-                console.log(err);
-            });
-        } else {
-            empty = true;
-            res.redirect("/");
-        }
-    });
+    let data = querystring.parse(req.body);
+    console.log(data);
+    if (data.name && data.surname && data.canvasimg) {
+        const text = 'INSERT INTO signatures (first, last, signature, date) VALUES ($1, $2, $3, $4) RETURNING *';
+        const values = [data.name, data.surname, data.canvasimg, date];
+        db.query(text, values).then((results) => {
+            console.log(results.rows[0]);
+            req.session.signatureId = results.rows[0].id;
+        }).then(() => {
+            res.redirect("/thanks");
+            empty = false;
+        }).catch(function(err) {
+            console.log(err);
+        });
+    } else {
+        empty = true;
+        res.redirect("/");
+    }
 });
 
 app.get("/thanks", (req, res) => {

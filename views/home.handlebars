@@ -1,0 +1,24 @@
+<h1>Bring back McDonald's chicken nugget "szechuan sauce"!</h1>
+<img src="/public/main.gif" alt="">
+<div class="text-container">
+    <p>We all love McDonald's. And we all adore their McNuggets. But did you know that back in 1998 they had special sauce as a promo for "Mulan" cartoon? And it was delicious! Wa are asking them to bring this sauce back in Germany!</p>
+    <p>So please fill this form and click "Submit" button. After that we will take care of your vote.</p>
+    <p class="wubba">Wubba lubba dub dub!</p>
+    <p class="error">{{err}}</p>
+    <form action="/form" method="post">
+        <div class="input-wrapper">
+            <label for="name">First name</label>
+            <input type="text" id="name" name="name" required pattern="[A-Z][a-z]{2,10}">
+        </div>
+        <div class="input-wrapper">
+            <label for="surname">Last name</label>
+            <input type="text" id="surname" name="surname" required pattern="[A-Z][a-z]{2,10}">
+        </div>
+        <div class="input-wrapper">
+            <input type="hidden" name="canvasimg" id="hidden">
+            <canvas id="myCanvas" width="600" height="100"></canvas>
+            <input type="submit" value="Submit" id="subm">
+        </div>
+    </form>
+</div>
+<script src="/public/script.js"></script>

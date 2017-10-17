@@ -1,0 +1,59 @@
+body {
+    font-family: "PT Sans", sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: khaki;
+}
+
+h1 {
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+
+.wubba {
+    color: dodgerblue;
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.text-container {
+    width: 600px;
+}
+
+canvas {
+    display: block;
+    border: 1px dotted black;
+    background-color: white;
+}
+
+.input-wrapper {
+    display: inline-block;
+}
+
+.error {
+    color: darkred;
+}
+
+input:invalid {
+    border: 2px dotted red;
+}
+
+input:valid {
+    border: 2px solid green;
+}
+
+.nugget {
+    width: 400px;
+}
+
+.identity-image {
+    height: 400px;
+}
+
+.thanksSignature {
+    border: 2px black solid;
+}

@@ -1,0 +1,19 @@
+<h1>Help make world a little bit better!!</h1>
+<img src="/public/identity.jpeg" alt="" class="identity-image">
+<div class="text-container">
+    <p>Please reveal your identity!</p>
+    <p class="error">{{err}}</p>
+    <form action="/login" method="post">
+        <div class="input-wrapper">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="input-wrapper">
+            <label for="pass">Password</label>
+            <input type="password" id="pass" name="pass" required pattern=".{6,}" title="Six or more characters, please">
+        </div>
+        <div class="input-wrapper">
+            <input type="submit" value="Log in" id="login">
+        </div>
+    </form>
+</div>

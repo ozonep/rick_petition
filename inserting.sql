@@ -1,0 +1,19 @@
+DROP TABLE IF EXISTS signatures;
+
+CREATE TABLE signatures (
+  id SERIAL PRIMARY KEY ,
+  first VARCHAR(100) NOT NULL ,
+  last VARCHAR(100) NOT NULL ,
+  signature TEXT not NULL ,
+  date TIMESTAMP,
+  user_id INTEGER NOT NULL
+);
+
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY ,
+  first VARCHAR(100) NOT NULL ,
+  last VARCHAR(100) NOT NULL ,
+  email VARCHAR(100) NOT NULL UNIQUE ,
+  password VARCHAR(100) NOT NULL
+)

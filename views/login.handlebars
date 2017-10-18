@@ -4,6 +4,7 @@
     <p>Please reveal your identity!</p>
     <p class="error">{{err}}</p>
     <form action="/login" method="post">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="input-wrapper">
             <label for="email">E-mail</label>
             <input type="email" id="email" name="email" required>

@@ -20,6 +20,6 @@ CREATE TABLE user_profiles (
 CREATE TABLE signatures (
   id SERIAL PRIMARY KEY ,
   signature TEXT not NULL ,
-  date TIMESTAMP WITH TIME ZONE,
+  date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
   user_id INTEGER REFERENCES users (id)
 );

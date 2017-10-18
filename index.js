@@ -22,7 +22,12 @@ app.use(cookieSession({
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/public', express.static(__dirname + '/public'));
-// app.use(csurf({ cookie: false }));
+app.use(csurf({ cookie: false }));
+app.use(function (err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN') return next(err);
+    res.status(403);
+    res.send('form tampered with');
+});
 
 function hashPassword(plainTextPassword) {
     return new Promise(function(resolve, reject) {
@@ -58,11 +63,23 @@ app.get("/", (req, res) => {
     } else {
         res.render("home", {
             title: "Petition",
+            csrfToken: req.csrfToken(),
             helpers: {
                 err: function () {
                     if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
                 }
             }
+        });
+    }
+});
+
+app.get("/profile", (req, res) => {
+    if (!req.session.user) {
+        res.redirect("/register");
+    } else {
+        res.render("profile", {
+            title: "Profile",
+            csrfToken: req.csrfToken()
         });
     }
 });
@@ -74,7 +91,8 @@ app.get("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
     res.render("register", {
-        title: "registration",
+        title: "Registration",
+        csrfToken: req.csrfToken(),
         helpers: {
             err: function () {
                 if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
@@ -89,6 +107,7 @@ app.get("/login", (req, res) => {
     } else {
         res.render("login", {
             title: "Log in",
+            csrfToken: req.csrfToken(),
             helpers: {
                 err: function () {
                     if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
@@ -96,6 +115,19 @@ app.get("/login", (req, res) => {
             }
         });
     }
+});
+
+app.post("/profile", (req, res) => {
+    let data = req.body;
+    const text = "INSERT INTO user_profiles (age, city, url, user_id) VALUES (NULLIF($1, '')::integer, $2, $3, $4)";
+    const values = [data.age, data.city, data.url, req.session.user.id];
+    db.query(text, values).then((results) => {
+        console.log(results.rows[0]);
+        res.redirect("/");
+        empty = false;
+    }).catch((err) => {
+        console.log(err);
+    });
 });
 
 app.post("/login", (req, res) => {
@@ -106,7 +138,10 @@ app.post("/login", (req, res) => {
         const value = [data.email];
         db.query(text, value).then((results) => {
             result = results.rows[0];
-            return checkPassword(data.pass, result.password);
+            // TODO Ask David is there way to do better
+            if (result.password) {
+                return checkPassword(data.pass, result.password);
+            }
         }).then((doesMatch) => {
             console.log(doesMatch);
             if (doesMatch) {
@@ -145,7 +180,7 @@ app.post("/register", (req, res) => {
                 id: results.rows[0].id
             };
         }).then(() => {
-            res.redirect("/");
+            res.redirect("/profile");
             empty = false;
         }).catch((err) => {
             console.log(err);
@@ -192,7 +227,7 @@ app.get("/thanks", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    db.query('SELECT first, last FROM signatures').then(function(results) {
+    db.query('SELECT first, last FROM users').then(function(results) {
         let voters = results.rows;
         console.log(voters);
         res.render("signers", {
@@ -203,5 +238,7 @@ app.get("/signers", (req, res) => {
         console.log(err);
     });
 });
+
+
 
 app.listen(8080);

@@ -8,6 +8,7 @@
     <form action="/form" method="post">
         <div class="input-wrapper">
             <input type="hidden" name="canvasimg" id="hidden">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <canvas id="myCanvas" width="600" height="100"></canvas>
             <input type="submit" value="Submit" id="subm">
         </div>

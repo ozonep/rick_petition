@@ -2,7 +2,7 @@
 <img src="/public/excited.gif" alt="" class="thanks">
 <div class="people-container">
     {{#voters}}
-        <p>{{this.first}} {{this.last}}</p>
+        <p><a href="{{../url}}">{{this.first}} {{this.last}}</a>({{age}}<a href="/signers/{{city}}">{{city}})</a></p>
     {{/voters}}
 </div>
 <button id="logout_btn" onclick="location.href='/logout'">Logout</button>

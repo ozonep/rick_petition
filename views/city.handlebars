@@ -1,0 +1,12 @@
+<h1>Here, take a look at all these great people from {{city}}, that signed petition!</h1>
+<img src="/public/excited.gif" alt="" class="thanks">
+<div class="people-container">
+    {{#citizens}}
+        {{#if this.url}}
+            <p><a href="{{this.url}}">{{this.first}} {{this.last}}</a> {{this.age}}</p>
+        {{else}}
+            <p><a>{{this.first}} {{this.last}}</a> {{this.age}}</p>
+        {{/if}}
+    {{/citizens}}
+</div>
+<button id="logout_btn" onclick="location.href='/logout'">Logout</button>

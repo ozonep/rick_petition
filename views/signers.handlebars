@@ -2,7 +2,13 @@
 <img src="/public/excited.gif" alt="" class="thanks">
 <div class="people-container">
     {{#voters}}
-        <p><a href="{{../url}}">{{this.first}} {{this.last}}</a>({{age}}<a href="/signers/{{city}}">{{city}})</a></p>
+        {{#if this.url}}
+            <p><a href="{{this.url}}">{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
+        {{else}}
+            <p><a>{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
+        {{/if}}
     {{/voters}}
 </div>
 <button id="logout_btn" onclick="location.href='/logout'">Logout</button>
+
+

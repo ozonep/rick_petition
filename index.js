@@ -8,6 +8,7 @@ const csurf = require("csurf");
 const app = express();
 const db = spicedPg('postgres:ivanmalkov:password@localhost:5432/pet');
 var empty = false;
+// TODO Fix date!
 var date = new Date();
 // var countries = require ('countries-cities').getCountries();
 // var cities = require ('countries-cities').getCities(country_name);
@@ -60,6 +61,8 @@ function checkPassword(textEnteredInLoginForm, hashedPasswordFromDatabase) {
 app.get("/", (req, res) => {
     if (!req.session.user) {
         res.redirect("/register");
+    } else if (req.session.signatureId) {
+        res.redirect("/thanks");
     } else {
         res.render("home", {
             title: "Petition",
@@ -76,12 +79,19 @@ app.get("/", (req, res) => {
 app.get("/profile", (req, res) => {
     if (!req.session.user) {
         res.redirect("/register");
+    } else if (req.session.profile) {
+        res.redirect("/profile/edit");
     } else {
         res.render("profile", {
             title: "Profile",
             csrfToken: req.csrfToken()
         });
+        req.session.profile = true;
     }
+});
+
+app.get("/profile/edit", (req, res) => {
+
 });
 
 app.get("/logout", (req, res) => {
@@ -90,15 +100,20 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-    res.render("register", {
-        title: "Registration",
-        csrfToken: req.csrfToken(),
-        helpers: {
-            err: function () {
-                if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
+    if (!req.session.user) {
+        res.render("register", {
+            title: "Registration",
+            csrfToken: req.csrfToken(),
+            helpers: {
+                err: function () {
+                    if (empty) return "Sorry, you didn't fill all necessary fields or used inappropriate characters";
+                }
             }
-        }
-    });
+        });
+    }
+    else {
+        res.redirect("/");
+    }
 });
 
 app.get("/login", (req, res) => {
@@ -117,12 +132,76 @@ app.get("/login", (req, res) => {
     }
 });
 
+app.get("/signers/:city", (req, res) => {
+    if (req.session.signatureId) {
+        const text = 'SELECT * FROM users JOIN user_profiles ON users.id = user_profiles.user_id WHERE user_profiles.city = $1';
+        const values = [req.params.city];
+        db.query(text, values).then((results) => {
+            let citizens = results.rows;
+            res.render("city", {
+                city: req.params.city,
+                citizens: citizens,
+            });
+        });
+    } else {
+        res.redirect("/");
+    }
+});
+
+app.get("/thanks", (req, res) => {
+    if (req.session.signatureId) {
+        db.query('SELECT id, signature FROM signatures').then(function(results) {
+            let voterNumber = results.rows.length;
+            let myImg = results.rows[req.session.signatureId - 1].signature;
+            res.render("thanks", {
+                title: "Thank you!",
+                number: voterNumber,
+                sign: myImg
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    } else {
+        res.redirect("/");
+    }
+});
+
+app.get("/signers", (req, res) => {
+    if (req.session.signatureId) {
+        db.query('SELECT * FROM users JOIN user_profiles ON users.id = user_profiles.user_id').then(function(results) {
+            let voters = results.rows;
+            console.log(voters);
+            res.render("signers", {
+                title: "Signers",
+                voters: voters,
+                helpers: {
+                    signs: function (age, city) {
+                        if (city && age) {
+                            return `(${age}, <a href="/signers/${city}">${city}</a>)`;
+                        } else if (!age && !city) {
+                            return "";
+                        } else if (!age && city) {
+                            return `(<a href="/signers/${city}">${city}</a>)`;
+                        } else {
+                            return `(${age})`;
+                        }
+                    }
+                }
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    } else {
+        res.redirect("/");
+    }
+});
+
 app.post("/profile", (req, res) => {
     let data = req.body;
     const text = "INSERT INTO user_profiles (age, city, url, user_id) VALUES (NULLIF($1, '')::integer, $2, $3, $4)";
     const values = [data.age, data.city, data.url, req.session.user.id];
     db.query(text, values).then((results) => {
-        console.log(results.rows[0]);
+        console.log(results.rows);
         res.redirect("/");
         empty = false;
     }).catch((err) => {
@@ -137,10 +216,13 @@ app.post("/login", (req, res) => {
         const text = 'SELECT * FROM users WHERE email = $1';
         const value = [data.email];
         db.query(text, value).then((results) => {
-            result = results.rows[0];
-            // TODO Ask David is there way to do better
-            if (result.password) {
+            if (results.rows[0]) {
+                result = results.rows[0];
                 return checkPassword(data.pass, result.password);
+            } else {
+                res.redirect("/login");
+                empty = true;
+                throw new Error('abort promise chain');
             }
         }).then((doesMatch) => {
             console.log(doesMatch);
@@ -154,6 +236,7 @@ app.post("/login", (req, res) => {
                 res.redirect("/");
             } else {
                 res.redirect("/login");
+                empty = true;
             }
         }).catch((err) => {
             console.log(err);
@@ -211,34 +294,5 @@ app.post("/form", (req, res) => {
         res.redirect("/");
     }
 });
-
-app.get("/thanks", (req, res) => {
-    db.query('SELECT id, signature FROM signatures').then(function(results) {
-        let voterNumber = results.rows.length;
-        let myImg = results.rows[req.session.signatureId - 1].signature;
-        res.render("thanks", {
-            title: "Thank you!",
-            number: voterNumber,
-            sign: myImg
-        });
-    }).catch((err) => {
-        console.log(err);
-    });
-});
-
-app.get("/signers", (req, res) => {
-    db.query('SELECT first, last FROM users').then(function(results) {
-        let voters = results.rows;
-        console.log(voters);
-        res.render("signers", {
-            title: "Signers",
-            voters: voters,
-        });
-    }).catch((err) => {
-        console.log(err);
-    });
-});
-
-
 
 app.listen(8080);

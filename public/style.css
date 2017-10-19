@@ -57,3 +57,7 @@ input:valid {
 .thanksSignature {
     border: 2px black solid;
 }
+
+.cool {
+    width: 200px;
+}

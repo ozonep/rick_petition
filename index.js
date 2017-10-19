@@ -91,12 +91,35 @@ app.get("/profile", (req, res) => {
 });
 
 app.get("/profile/edit", (req, res) => {
-
+    if (!req.session.user) {
+        res.redirect("/register");
+    } else {
+        const text = 'SELECT * FROM users LEFT JOIN user_profiles ON users.id = user_profiles.user_id WHERE users.id = $1';
+        const values = [req.session.user.id];
+        db.query(text, values).then((results) => {
+            let data = results.rows[0];
+            res.render("profedit", {
+                title: "Profile Editing",
+                csrfToken: req.csrfToken(),
+                first: data.first,
+                last: data.last,
+                email: data.email,
+                age: data.age,
+                city: data.city,
+                url: data.url
+            });
+        });
+    }
 });
 
 app.get("/logout", (req, res) => {
     req.session = null;
     res.redirect("/login");
+});
+
+app.get("/deletesig", (req, res) => {
+    req.session.signatureId = null;
+    res.redirect("/");
 });
 
 app.get("/register", (req, res) => {
@@ -110,8 +133,7 @@ app.get("/register", (req, res) => {
                 }
             }
         });
-    }
-    else {
+    } else {
         res.redirect("/");
     }
 });
@@ -139,6 +161,7 @@ app.get("/signers/:city", (req, res) => {
         db.query(text, values).then((results) => {
             let citizens = results.rows;
             res.render("city", {
+                title: "Cities",
                 city: req.params.city,
                 citizens: citizens,
             });
@@ -193,6 +216,45 @@ app.get("/signers", (req, res) => {
         });
     } else {
         res.redirect("/");
+    }
+});
+
+app.post("/profedit", (req, res) => {
+    let data = req.body;
+    if (data.pass) {
+        hashPassword(data.pass).then((hash) => {
+            const text = 'UPDATE users SET (first, last, email, password) = ($1,$2, $3, $4) WHERE id = $5 RETURNING *';
+            const values = [data.name, data.surname, data.email, hash, data.pass];
+            db.query(text, values).then((results) => {
+                console.log(results.rows);
+                req.session.user.first = results.rows[0].first;
+                req.session.user.last = results.rows[0].last;
+                empty = false;
+                db.query(text_two, values_two).then(() => {
+                    res.redirect("/");
+                });
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    } else {
+        const text_one = 'UPDATE users SET (first, last, email) = ($1,$2, $3) WHERE id = $4 RETURNING *';
+        const values_one = [data.name, data.surname, data.email, req.session.user.id];
+        const text_two = 'INSERT INTO user_profiles (user_id, age, city, url) values ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET (age, city, url) = ($2, $3, $4) RETURNING *';
+        const values_two = [req.session.user.id, data.age, data.city, data.url];
+        db.query(text_one, values_one).then((results) => {
+            console.log(results.rows);
+            req.session.user.first = results.rows[0].first;
+            req.session.user.last = results.rows[0].last;
+            empty = false;
+            db.query(text_two, values_two).then(() => {
+                res.redirect("/");
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 });
 

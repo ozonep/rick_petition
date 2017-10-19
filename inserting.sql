@@ -23,3 +23,7 @@ CREATE TABLE signatures (
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
   user_id INTEGER REFERENCES users (id)
 );
+
+
+UPDATE users SET (first, last, email, password) = ($1,$2, $3, $4) WHERE id = req.session.id;
+INSERT INTO user_profiles (user_id, age, city, url) values ($1, $2, $3, $4) ON CONFLICT (user_id) DO UPDATE SET (age, city, url) = ($2, $3, $4);

@@ -168,7 +168,7 @@ app.get("/thanks", (req, res) => {
 
 app.get("/signers", (req, res) => {
     if (req.session.signatureId) {
-        db.query('SELECT * FROM users JOIN user_profiles ON users.id = user_profiles.user_id').then(function(results) {
+        db.query('SELECT * FROM users JOIN signatures ON users.id = signatures.user_id LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id').then(function(results) {
             let voters = results.rows;
             console.log(voters);
             res.render("signers", {
@@ -218,28 +218,28 @@ app.post("/login", (req, res) => {
         db.query(text, value).then((results) => {
             if (results.rows[0]) {
                 result = results.rows[0];
-                return checkPassword(data.pass, result.password);
+                checkPassword(data.pass, result.password).then((doesMatch) => {
+                    console.log(doesMatch);
+                    if (doesMatch) {
+                        req.session.user = {
+                            first: result.first,
+                            last: result.last,
+                            id: result.id
+                        };
+                        empty = false;
+                        res.redirect("/");
+                    } else {
+                        empty = true;
+                        res.redirect("/login");
+
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                });
             } else {
-                res.redirect("/login");
                 empty = true;
-                throw new Error('abort promise chain');
-            }
-        }).then((doesMatch) => {
-            console.log(doesMatch);
-            if (doesMatch) {
-                req.session.user = {
-                    first: result.first,
-                    last: result.last,
-                    id: result.id
-                };
-                empty = false;
-                res.redirect("/");
-            } else {
                 res.redirect("/login");
-                empty = true;
             }
-        }).catch((err) => {
-            console.log(err);
         });
     } else {
         empty = true;

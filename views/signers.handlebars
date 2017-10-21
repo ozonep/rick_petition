@@ -3,7 +3,7 @@
 <div class="people-container">
     {{#voters}}
         {{#if this.url}}
-            <p><a href="{{this.url}}">{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
+            <p><a href="{{this.url}}" target="_blank">{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
         {{else}}
             <p><a>{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
         {{/if}}

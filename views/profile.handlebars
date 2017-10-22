@@ -1,23 +1,17 @@
 <h1>Tell us more about yourself</h1>
-<img src="/public/avatar.jpg" alt="">
+<img src="/public/avatar.jpg" alt="" class="profileimg">
 <div class="text-container">
     <p>Who you are, what you do, where are you from?</p>
     <form action="/profile" method="post">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="input-wrapper">
-            <label for="age">Age</label>
+            <label for="age">Age:</label>
             <input type="number" id="age" name="age">
-        </div>
-        <div class="input-wrapper">
-            <label for="city">City</label>
+            <label for="city">City:</label>
             <input type="text" id="city" name="city">
-        </div>
-        <div class="input-wrapper">
-            <label for="url">Homepage</label>
+            <label for="url">Homepage:</label>
             <input type="url" id="url" name="url">
-        </div>
-        <div class="input-wrapper">
-            <input type="submit" value="Submit" id="sub">
+            <input type="submit" value="Submit" id="submit">
         </div>
     </form>
 </div>

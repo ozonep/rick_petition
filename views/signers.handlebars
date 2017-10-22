@@ -1,14 +1,17 @@
-<h1>Here, take a look at all these great people, that signed petition!</h1>
-<img src="/public/excited.gif" alt="" class="thanks">
+<h1>Here, take a look at all these great people, that signed our petition!</h1>
+<img src="/public/tomjerry.gif" alt="" class="signersimg">
 <div class="people-container">
+    <ol>
     {{#voters}}
         {{#if this.url}}
-            <p><a href="{{this.url}}" target="_blank">{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
+            <li><a href="{{this.url}}" target="_blank">{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</li>
         {{else}}
-            <p><a>{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</p>
+            <li><a>{{this.first}} {{this.last}} </a> {{{signs this.age this.city}}}</li>
         {{/if}}
     {{/voters}}
+        </ol>
 </div>
+<a href="/thanks">Go to main page</a>
 <button id="logout_btn" onclick="location.href='/logout'">Logout</button>
 
 

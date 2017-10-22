@@ -1,29 +1,21 @@
 <h1>Help make world a little bit better!!</h1>
-<img src="/public/nuggets.jpg" alt="" class="nugget">
+<img src="/public/nuggets.jpg" alt="" class="nugget-heart">
 <div class="text-container">
-    <p>Please sign up, or log in, if you've already done that in the past</p>
+    <p class="main-par">Please sign up, or log in, if you're already registered user</p>
     <p class="wubba">Wubba lubba dub dub!</p>
     <p class="error">{{err}}</p>
     <form action="/register" method="post">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="input-wrapper">
-            <label for="name">First name</label>
+            <label for="name">First name:</label>
             <input type="text" id="name" name="name" required pattern="[A-Z][a-z]{2,10}">
-        </div>
-        <div class="input-wrapper">
-            <label for="surname">Last name</label>
+            <label for="surname">Last name:</label>
             <input type="text" id="surname" name="surname" required pattern="[A-Z][a-z]{2,10}">
-        </div>
-        <div class="input-wrapper">
-            <label for="email">E-mail</label>
+            <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
-        </div>
-        <div class="input-wrapper">
-            <label for="pass">Password</label>
+            <label for="pass">Password:</label>
             <input type="password" id="pass" name="pass" required pattern=".{6,}" title="Six or more characters, please">
-        </div>
-        <div class="input-wrapper">
-            <input type="submit" value="Sign Up" id="signup">
+            <input type="submit" value="Sign Up" id="submit">
         </div>
     </form>
 </div>

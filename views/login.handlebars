@@ -6,15 +6,12 @@
     <form action="/login" method="post">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="input-wrapper">
-            <label for="email">E-mail</label>
+            <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
-        </div>
-        <div class="input-wrapper">
-            <label for="pass">Password</label>
+            <label for="pass">Password:</label>
             <input type="password" id="pass" name="pass" required pattern=".{6,}" title="Six or more characters, please">
-        </div>
-        <div class="input-wrapper">
-            <input type="submit" value="Log in" id="login">
+            <input type="submit" value="Log in" id="submit">
         </div>
     </form>
+    <a href="/register">Go to registration page</a>
 </div>

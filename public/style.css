@@ -1,18 +1,28 @@
 body {
     font-family: "PT Sans", sans-serif;
-    text-align: center;
+    width: 1000px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    margin: 0 auto;
     background-color: khaki;
 }
 
 h1 {
+    margin-top: 1rem;
     font-size: 18px;
     text-transform: uppercase;
 }
 
+ol {
+    margin-bottom: 0.6rem;
+}
+
+/*p.main-par {*/
+    /*margin-top*/
+/*}*/
 
 .wubba {
     color: dodgerblue;
@@ -20,9 +30,9 @@ h1 {
     font-style: italic;
 }
 
-.text-container {
-    width: 600px;
-}
+/*.text-container {*/
+    /*width: 600px;*/
+/*}*/
 
 canvas {
     display: block;
@@ -31,11 +41,26 @@ canvas {
 }
 
 .input-wrapper {
-    display: inline-block;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    border: 1px dotted gray;
+    margin-bottom: 0.5rem;
+}
+
+.input-wrapper.main {
+    border: none;
 }
 
 .error {
     color: darkred;
+}
+
+input {
+    margin-bottom: 0.4rem;
+    width: 180px;
+    height: 30px;
 }
 
 input:invalid {
@@ -46,18 +71,42 @@ input:valid {
     border: 2px solid green;
 }
 
-.nugget {
-    width: 400px;
+#submit, #subm, #logout_btn {
+    margin-top: 0.5rem;
+    border: 1px solid black;
+}
+
+/*All pictures:*/
+
+img {
+    margin-bottom: 1rem;
+}
+
+.nugget-heart {
+    height: 300px;
 }
 
 .identity-image {
-    height: 400px;
+    height: 300px;
 }
 
 .thanksSignature {
     border: 2px black solid;
 }
 
-.cool {
-    width: 200px;
+.profileimg {
+    height: 300px;
 }
+
+.thanksimg {
+    height: 400px;
+}
+
+.signersimg {
+    height: 200px;
+}
+
+.mulan {
+    height: 300px;
+}
+

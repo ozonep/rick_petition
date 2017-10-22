@@ -1,5 +1,5 @@
 <h1>Here you can change information you provided to us!</h1>
-<img src="/public/cool.png" alt="" class="cool">
+<img src="/public/cool.png" alt="" class="profileimg">
 <div class="text-container">
     <p>But be aware... With great power comes great responsibility! Of keeping your profile cool.</p>
     <form action="/profile/edit" method="post">
@@ -7,33 +7,19 @@
         <div class="input-wrapper">
             <label for="name">First Name</label>
             <input type="text" id="name" name="name" value="{{first}}">
-        </div>
-        <div class="input-wrapper">
             <label for="surname">Last Name</label>
             <input type="text" id="surname" name="surname" value="{{last}}">
-        </div>
-        <div class="input-wrapper">
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" value="{{email}}">
-        </div>
-        <div class="input-wrapper">
             <label for="pass">Password</label>
             <input type="password" id="pass" name="pass" >
-        </div>
-        <div class="input-wrapper">
             <label for="age">Age</label>
             <input type="number" id="age" name="age" value="{{age}}">
-        </div>
-        <div class="input-wrapper">
             <label for="city">City</label>
             <input type="text" id="city" name="city" value="{{city}}">
-        </div>
-        <div class="input-wrapper">
             <label for="url">Homepage</label>
             <input type="url" id="url" name="url" value="{{url}}">
-        </div>
-        <div class="input-wrapper">
-            <input type="submit" value="Update Profile" id="sub">
+            <input type="submit" value="Update Profile" id="submit">
         </div>
     </form>
 </div>

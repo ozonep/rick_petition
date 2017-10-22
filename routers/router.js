@@ -2,8 +2,8 @@ const express = require('express');
 const router = new express.Router();
 const spicedPg = require('spiced-pg');
 const bcrypt = require('bcryptjs');
-var dbUrl = process.env.DATABASE_URL || 'postgres://ivanmalkov:password@localhost:5432/pet';
-const db = spicedPg(dbUrl);
+// var dbUrl = process.env.DATABASE_URL || 'postgres://ivanmalkov:password@localhost:5432/pet';
+const db = spicedPg(process.env.DATABASE_URL);
 
 function hashPassword(plainTextPassword) {
     return new Promise(function(resolve, reject) {

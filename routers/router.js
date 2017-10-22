@@ -34,6 +34,8 @@ function checkPassword(textEnteredInLoginForm, hashedPasswordFromDatabase) {
 
 router.route("/")
     .get((req, res) => {
+        req.session.cookie.maxAge = 3600000;
+        console.log(req.session);
         if (!req.session.user) {
             res.redirect("/register");
         } else if (req.session.signatureId) {
@@ -273,8 +275,9 @@ router.route("/login")
 ;
 
 router.get("/logout", (req, res) => {
-    req.session = null;
-    res.redirect("/login");
+    req.session.destroy(function() {
+        res.redirect("/login");
+    });
 });
 
 router.get("/deletesig", (req, res) => {
@@ -328,6 +331,13 @@ router.get("/thanks", (req, res) => {
 });
 
 router.get("/signers", (req, res) => {
+    //  client.get('city', function(err, data) {
+    //         if (err) {
+    //             return console.log(err);
+    //         }
+    //         console.log('The value of the "city" key is ' + data);
+    //     });
+    // });
     if (req.session.signatureId) {
         db.query('SELECT * FROM users JOIN signatures ON users.id = signatures.user_id LEFT JOIN user_profiles ON signatures.user_id = user_profiles.user_id').then(function(results) {
             let voters = results.rows;
@@ -356,6 +366,5 @@ router.get("/signers", (req, res) => {
         res.redirect("/");
     }
 });
-// TODO req.session.isEmpty array is truthy
 
 module.exports = router;

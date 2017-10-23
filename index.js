@@ -10,22 +10,43 @@ const client = redis.createClient({
     port: 6379
 });
 const session = require('express-session');
+var store = {};
 const Store = require('connect-redis')(session);
 // var countries = require ('countries-cities').getCountries();
 // var cities = require ('countries-cities').getCities(country_name);
 
 app.engine('handlebars', hb({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
-app.use(session({
-    store: new Store({
+// app.use(session({
+//     store: new Store({
+//         ttl: 3600,
+//         host: 'localhost',
+//         port: 6379
+//     }),
+//     resave: false,
+//     saveUninitialized: true,
+//     secret: 'something stupid'
+// }));
+
+if(process.env.REDIS_URL){
+    store = {
+        url: process.env.REDIS_URL
+    };
+} else {
+    store = {
         ttl: 3600,
         host: 'localhost',
         port: 6379
-    }),
-    resave: false,
+    };
+}
+
+app.use(session({
+    store: new Store(store),
+    resave: true,
     saveUninitialized: true,
     secret: 'something stupid'
 }));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/public', express.static(__dirname + '/public'));
 app.use(csurf({ cookie: false }));

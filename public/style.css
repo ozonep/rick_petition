@@ -1,5 +1,5 @@
 body {
-    font-family: "PT Sans", sans-serif;
+    font-family: "PT Sans", Helvetica, Arial, sans-serif;
     width: 1000px;
     display: flex;
     flex-direction: column;
